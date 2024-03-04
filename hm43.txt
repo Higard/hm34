@@ -1,0 +1,35 @@
+#VPC
+aws ec2 create-vpc --cidr-block 10.0.0.0/16 --instance-tenancy default
+
+#describe VPC
+aws ec2 describe-vpcs
+
+#create public subnet
+aws ec2 create-subnet --vpc-id vpc-0e935bec936711058 --cidr-block 10.0.1.0/24 --availability-zone us-east-1a
+
+#create IG
+aws ec2 create-internet-gateway
+
+#attach IG to VPC
+aws ec2 attach-internet-gateway --vpc-id vpc-0e935bec936711058 --internet-gateway-id igw-0a086e17294c22aeb
+
+#create route for Internet access
+aws ec2 create-route --route-table-id rtb-079ddfc1c08aad6c9 --destination-cidr-block 0.0.0.0/0 --gateway-id igw-0a086e17294c22aeb
+
+#create private subnet
+aws ec2 create-subnet --vpc-id vpc-0e935bec936711058 --cidr-block 10.0.2.0/24 --availability-zone us-east-1a
+
+#allocate Elastic IP(EIP)
+aws ec2 allocate-address --domain vpc
+
+#create NAT Gateway
+aws ec2 create-nat-gateway --subnet-id subnet-05345c9b3944d8961 --allocation-id eipalloc-0100ac2c38e893ba0
+
+#create route table for private subnet
+aws ec2 create-route-table --vpc-id vpc-0e935bec936711058
+
+#associate ruot table with private subnet
+aws ec2 associate-route-table --subnet-id subnet-05345c9b3944d8961 --route-table-id rtb-0efb538fc174d8d43
+
+#route for Internet access via NAT Gateway
+aws ec2 create-route --route-table-id rtb-0efb538fc174d8d43 --destination-cidr-block 0.0.0.0/0 --nat-gateway-id nat-04b166f496aea00fa
